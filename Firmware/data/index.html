@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IOT-Assistant System</title>
+  <style>
+    body {
+      text-align: center;
+    }
+    #statusBox {
+      font-size: 24px;
+      width: 200px;
+      margin: 0 auto;
+    }
+    #distanceBox {
+      font-size: 24px;
+      width: 200px;
+      margin: 0 auto;
+    }
+    #emergencyAlert {
+      font-size: 24px;
+      width: 200px;
+      margin: 0 auto;
+      font-weight: bold;
+    }
+
+    .item {
+      width: 200px; /* Set custom width */
+      margin-right: 20px; /* Set horizontal gap */
+      background-color: rgba(173, 216, 230, 0); /* Just for visualization */
+      padding: 50px; /* Add padding for better spacing */
+      border: 1px solid rgba(0, 0, 0, 0); /* Add border for better visibility */
+    }
+    .call-button {
+      display: inline-block;
+      width: 100px;
+      height: 100px;
+      background-color: #d1defc; /* Button background color */
+      color: #272626; /* Button text color */
+      border-radius: 50%; /* Make it circular */
+      border: none; /* Remove border */
+      cursor: pointer; /* Add cursor pointer */
+      font-size: 20px;
+      line-height: 100px; /* Center the icon vertically */
+      text-align: center;
+    }
+  </style>
+  <script>
+    function fetchData() {
+      fetch('/distance')
+        .then(response => response.text())
+        .then(distance => {
+          document.getElementById('distanceBox').innerText = distance + " cm";
+        });
+
+      fetch('/status')
+        .then(response => response.text())
+        .then(status => {
+          document.getElementById('statusBox').innerText = status;
+          if (status === "Too Near") {
+            document.body.style.backgroundColor = "red";
+          } else if (status === "Be Careful") {
+            document.body.style.backgroundColor = "yellow";
+          } else {
+            document.body.style.backgroundColor = "lightgreen";
+          }
+        });
+
+      fetch('/emergency')
+        .then(response => response.text())
+        .then(emergencyStatus => {
+          if (emergencyStatus === "true") {
+            document.getElementById('emergencyAlert').innerText = "EMERGENCY ALERT!";
+            document.getElementById('emergencyAlert').style.color = "red";
+          } else {
+            document.getElementById('emergencyAlert').innerText = "";
+          }
+        });
+    }
+
+    setInterval(fetchData, 400); // Fetch data every 400ms
+
+    function alertEmergency() {
+      fetch('/alert');
+    }
+  </script>
+</head>
+<body onload="fetchData()">
+  <h1>IOT-Assistant System</h1>
+  <div id="distance"><h1>Distance</h1></div>
+  <div id="distanceBox"></div>
+  <div id="status"><h1>Status</h1></div>
+  <div id="statusBox"></div>
+  <div id="emergencyAlert"></div>
+  <div class="item">  </div>
+  <button class="call-button" onclick="alertEmergency()">CALL</button>
+</body>
+</html>
